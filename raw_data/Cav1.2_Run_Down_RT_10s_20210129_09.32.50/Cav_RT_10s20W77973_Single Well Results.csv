@@ -1,0 +1,61 @@
+Analyzer File Name;Cav1.2_Run_Down_10s_20210129_09.32.50.ana;;;;;;
+Analyzer File Path;\\rbansis04smb.bas.roche.com\prlabdata001\NCS_LabData\SynchroPatch_384\PatchControl\RecordedData\210129\Cav_RT_10s20W77973\Cav1.2_Run_Down_10s_20210129_09.32.50\Cav1.2_Run_Down_10s_20210129_09.32.50.ana;;;;;;
+Last Modified;02/02/2021 07:16:41;;;;;;
+Raw Data File Name;Cav1.2_Run_Down_10s_20210129_09.32.50.rec;;;;;;
+Raw Data File Path;\\rbansis04smb.bas.roche.com\prlabdata001\NCS_LabData\SynchroPatch_384\PatchControl\RecordedData\210129\Cav_RT_10s20W77973\Cav1.2_Run_Down_10s_20210129_09.32.50\Cav1.2_Run_Down_10s_20210129_09.32.50.rec;;;;;;
+Recording started;01/29/2021 09:32:50;;;;;;
+Recording finalised;01/29/2021 09:42:28;;;;;;
+Type of Export;Well Results;;;;;;
+Export Name;Single Well Results;;;;;;
+Cell Type;CHO-hERG;;;;;;
+Channel Type;Ready-to-use;;;;;;
+Research Project ;;;;;;;
+Screen Name;;;;;;;
+Gating Type;;;;;;;
+;;;;;;;
+Well ID;Compound Name;OA Function ;OA Function ;OA Function ;OA Function ;OA Function ;OA Function 
+;;Imax;Hill;IC50;Number of Data Points;Sweep Result 1;Sweep Result 1
+;;;;;;Concentration;Response (normalised)
+J01;ORM-10103;;;;0;1.000000E-5;NaN
+K02;ORM-10103;;;;0;1.000000E-5;NaN
+L02;ORM-10103;;;;0;1.000000E-5;NaN
+O02;ORM-10103;;;;0;1.000000E-5;NaN
+F03;ORM-10103;;;;0;1.000000E-5;NaN
+K03;ORM-10103;;;;0;1.000000E-5;NaN
+N03;ORM-10103;;;;0;1.000000E-5;NaN
+I04;ORM-10103;;;;0;1.000000E-5;NaN
+B05;ORM-10103;;;;0;1.000000E-5;NaN
+P05;ORM-10103;;;;0;1.000000E-5;NaN
+B06;ORM-10103;;;;0;1.000000E-5;NaN
+N06;ORM-10103;;;;0;1.000000E-5;NaN
+A07;ORM-10103;;;;0;1.000000E-5;NaN
+C07;ORM-10103;;;;0;1.000000E-5;NaN
+I07;ORM-10103;;;;0;1.000000E-5;NaN
+F08;ORM-10103;;;;0;1.000000E-5;NaN
+G08;ORM-10103;;;;0;1.000000E-5;NaN
+O08;ORM-10103;;;;0;1.000000E-5;NaN
+A09;ORM-10103;;;;0;1.000000E-5;NaN
+C09;ORM-10103;;;;0;1.000000E-5;NaN
+D10;ORM-10103;;;;0;1.000000E-5;NaN
+K11;ORM-10103;;;;0;1.000000E-5;NaN
+C12;ORM-10103;;;;0;1.000000E-5;NaN
+G12;ORM-10103;;;;0;1.000000E-5;NaN
+B13;DMSO;;;;0;1.000000E-5;NaN
+C13;DMSO;;;;0;1.000000E-5;NaN
+I13;DMSO;;;;0;1.000000E-5;NaN
+A15;DMSO;;;;0;1.000000E-5;NaN
+B16;DMSO;;;;0;1.000000E-5;NaN
+D16;DMSO;;;;0;1.000000E-5;NaN
+N16;DMSO;;;;0;1.000000E-5;NaN
+I17;DMSO;;;;0;1.000000E-5;NaN
+E18;DMSO;;;;0;1.000000E-5;NaN
+D19;DMSO;;;;0;1.000000E-5;NaN
+F19;DMSO;;;;0;1.000000E-5;NaN
+C20;DMSO;;;;0;1.000000E-5;NaN
+P20;DMSO;;;;0;1.000000E-5;NaN
+F21;DMSO;;;;0;1.000000E-5;NaN
+J21;DMSO;;;;0;1.000000E-5;NaN
+A22;DMSO;;;;0;1.000000E-5;NaN
+H22;DMSO;;;;0;1.000000E-5;NaN
+K22;DMSO;;;;0;1.000000E-5;NaN
+J24;DMSO;;;;0;1.000000E-5;NaN

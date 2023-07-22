@@ -1,0 +1,15 @@
+Analyzer File Name;Cav1.2_Run_Down_10s_20210129_09.32.50.ana;;;;
+Analyzer File Path;\\rbansis04smb.bas.roche.com\prlabdata001\NCS_LabData\SynchroPatch_384\PatchControl\RecordedData\210129\Cav_RT_10s20W77973\Cav1.2_Run_Down_10s_20210129_09.32.50\Cav1.2_Run_Down_10s_20210129_09.32.50.ana;;;;
+Raw Data File Name;Cav1.2_Run_Down_10s_20210129_09.32.50.rec;;;;
+Raw Data File Path;\\rbansis04smb.bas.roche.com\prlabdata001\NCS_LabData\SynchroPatch_384\PatchControl\RecordedData\210129\Cav_RT_10s20W77973\Cav1.2_Run_Down_10s_20210129_09.32.50\Cav1.2_Run_Down_10s_20210129_09.32.50.rec;;;;
+Recording started;01/29/2021 09:32:50;;;;
+Recording finalised;01/29/2021 09:42:28;;;;
+Cell Type;CHO-hERG;;;;
+Channel Type;Ready-to-use;;;;
+Research Project ;;;;;
+Screen Name;;;;;
+;;;;;
+Compound Name;OA Function ;OA Function ;OA Function ;OA Function ;OA Function 
+;% Response;IC50;Hill;Number of Wells;Number of Data Points
+ORM-10103;;;;0;0
+DMSO;;;;0;0
