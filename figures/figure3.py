@@ -7,15 +7,13 @@ import pandas as pd
 # import numpy as np
 import os
 
-import sys
-sys.path.append('../')
 import helpers # for cap ciltering
 
 # Set font
 matplotlib.rc('font', family='arial', size = 10)
 
 # load protocol
-protocol = pd.read_csv('../resources/protocol.csv', delimiter=',')
+protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
 time = protocol.iloc[:,0]
 ind_step_start = protocol[time == 860].index.tolist()[0]
 ind_step_end = protocol[time == 1010].index.tolist()[0]
@@ -23,12 +21,12 @@ ind_step_end = protocol[time == 1010].index.tolist()[0]
 # load all current
 directoryname = 'Cav1.2_Run_Down_BT_10s_20210129_12.07.03'
 pathtodatadirectory = 'raw_data/'
-files = os.listdir(f'../raw_data/{directoryname}')
+files = os.listdir(f'raw_data/{directoryname}')
 cell = 'C19'
 for f in files:
     if f[-8:-5] == cell:
         filename = f
-        path = f'../raw_data/{directoryname}/{filename}'
+        path = f'raw_data/{directoryname}/{filename}'
         break
 cell_data = pd.read_csv(path, sep =';', usecols=range(1,58 + 2))
 
@@ -38,7 +36,7 @@ all_sweeps = helpers.cap_filter(ind_step_start, ind_step_end, 0.1, all_sweeps) #
 all_sweeps = all_sweeps.iloc[:, :34 + 1]
 
 # load the gleak, Eleak, etc.
-prop_data = pd.read_csv(f'../output/BT_10/prop_{cell}.csv')
+prop_data = pd.read_csv(f'output/BT_10/prop_{cell}.csv')
 g_1, E_1 = prop_data.iloc[0]['gleak (nS)'], prop_data.iloc[0]['Eleak (mV)']
 g_n, E_n = prop_data.iloc[-1]['gleak (nS)'], prop_data.iloc[-1]['Eleak (mV)'] 
 
@@ -72,7 +70,7 @@ sub4.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
 sub5.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
 
 # plot inset protocol
-protocol_fig = pd.read_csv('../resources/protocol_fig.csv', delimiter=',')
+protocol_fig = pd.read_csv('resources/protocol_fig.csv', delimiter=',')
 ins_ax = inset_axes(sub3, width = "30%", height = '52%', loc = 'center', borderpad =3.2)
 ins_ax.plot(time, protocol_fig.iloc[:,1], color ='grey')
 
@@ -107,5 +105,5 @@ sub5.yaxis.set_major_locator(yticks)
 
 
 plt.tight_layout()
-plt.savefig('figure3.pdf')
+plt.savefig('figures/figure3.pdf')
 plt.close()

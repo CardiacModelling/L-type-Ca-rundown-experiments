@@ -8,7 +8,7 @@ import numpy as np
 # Set font
 matplotlib.rc('font', family='arial', size = 10)
 
-protocol = pd.read_csv('../resources/protocol.csv', delimiter=',')
+protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
 ind_step_start = protocol[protocol.iloc[:,0] == 860].\
     index.tolist()[0]
 ind_step_end = protocol[protocol.iloc[:,0] == 1010].\
@@ -17,10 +17,10 @@ time = protocol.iloc[:,0].iloc[ind_step_start: ind_step_end]
 time_x = time - time.iloc[0]
 
 # Load sweep times
-sweep_time = pd.read_csv('../resources/BT_10_sweep_time.csv') # in seconds
+sweep_time = pd.read_csv('resources/BT_10_sweep_time.csv') # in seconds
 
 
-data = pd.read_csv('../output/BT_10/C19.csv')
+data = pd.read_csv('output/BT_10/C19.csv')
 fig = plt.figure(figsize=(6.6, 3))
 ax1 = fig.add_subplot(121)
 ax2 = fig.add_subplot(122)
@@ -62,4 +62,4 @@ ax2.set_ylim(ymin, ymax)
 ax3.set_ylim(ymin_3*ymin/ymin_2, ymax_3*ymax/ymax_2)
 ax3.set_ylabel('Rundown')
 plt.tight_layout()
-plt.savefig('figure1.pdf')
+plt.savefig('figures/figure1.pdf')

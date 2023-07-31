@@ -4,7 +4,7 @@ def selected_cells(temp, hold_dur):
     """
     Returns an array of the selected cells for a given temeprature and holding duration
     """
-    path = '../output/'
+    path = 'output/'
 
     pathf = path + f'{temp}_{hold_dur}/_cell_qc.txt'
     f = open(pathf, 'r')

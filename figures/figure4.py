@@ -3,14 +3,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-import sys
-sys.path.append("../")
-
 import extensions
 import helpers
 
 # Index for each step
-protocol = pd.read_csv('../resources/protocol.csv', delimiter=',')
+protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
 time = protocol.iloc[:,0]
 i_start = protocol[time == 860].index.tolist()[0]
 i_end = protocol[time == 1010].index.tolist()[0]
@@ -71,9 +68,9 @@ for temp in temperature:
     for hold_dur in holding_duration:
         # load the data
         cells = extensions.selected_cells(temp, hold_dur)
-        sweep_time = pd.read_csv(f'../resources/{temp}_{hold_dur}_sweep_time.csv')
+        sweep_time = pd.read_csv(f'resources/{temp}_{hold_dur}_sweep_time.csv')
         
-        path = f'../output/{temp}_{hold_dur}/'
+        path = f'output/{temp}_{hold_dur}/'
 
         count_on = 0
         count_off = 0
@@ -116,5 +113,5 @@ for temp in temperature:
 
 
 plt.tight_layout()
-fig.savefig('figure4.pdf', facecolor='w', transparent=False)
+fig.savefig('figures/figure4.pdf', facecolor='w', transparent=False)
 plt.close()

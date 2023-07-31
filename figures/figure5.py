@@ -10,11 +10,7 @@ import matplotlib
 import pandas as pd
 import numpy as np
 
-import sys
-sys.path.append("../")
-
 import helpers
-
 
 # Set font
 matplotlib.rc('font', family='arial', size = 10)
@@ -23,7 +19,7 @@ temp_map = {310: 'BT', 298 : 'RT'}
 color_map = {'Linear': '#1f77b4', 'Saturating': '#ff7f0e', 'Other': 'grey'}
 
 # Index for each step
-protocol = pd.read_csv('../resources/protocol.csv', delimiter=',')
+protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
 time = protocol.iloc[:,0]
 dt = time[1] - time[0] #ms
 i_start = protocol[time == 860].index.tolist()[0]
@@ -42,7 +38,7 @@ X_RT_hold = X_Ca/total
 leak_prop = {'BT': [X_BT_arr, X_BT_hold], 'RT': [X_RT_arr, X_RT_hold]}
 
 # load rrate, shape, cell name
-rrate_data = pd.read_csv('../output/r_rate_database.csv')
+rrate_data = pd.read_csv('output/r_rate_database.csv')
 
 Ca_frac = []
 Ca_eff = []
@@ -70,7 +66,7 @@ for i in range(len(rrate_data)):
     # continue
 
     # load the gleak, Eleak, and Cap 
-    pathtoprop = f'../output/{temp}_{hold}/prop_{cell}.csv'
+    pathtoprop = f'output/{temp}_{hold}/prop_{cell}.csv'
     prop_data = pd.read_csv(pathtoprop)
 
     gleak = prop_data['gleak (nS)']
@@ -78,7 +74,7 @@ for i in range(len(rrate_data)):
     cap = prop_data['cap (pF)']
 
     # load the ical across all sweeps for the cell
-    pathtocell = f'../output/{temp}_{hold}/{cell}.csv'
+    pathtocell = f'output/{temp}_{hold}/{cell}.csv'
     ical_all = pd.read_csv(pathtocell)
 
     n_sweeps = len(ical_all.columns)
@@ -96,7 +92,7 @@ for i in range(len(rrate_data)):
     Ca_leak = Ca_leak.sum()
 
     ## between sweeps
-    t_sweep = pd.read_csv(f'../resources/{temp}_{hold}_sweep_time.csv')
+    t_sweep = pd.read_csv(f'resources/{temp}_{hold}_sweep_time.csv')
     for i in range(n_sweeps - 1):
         if i == 0:
             I = gleak.iloc[i] * (-90 - Eleak.iloc[i]) * leak_prop[temp][1]
@@ -131,7 +127,7 @@ for i in range(len(rrate_data)):
 df = {'leak moles frac': Ca_frac, 'Ca_eff': Ca_eff, 'Ca_tot': Ca_ntot, 'Temperature': temp_arr, \
       'thold': thold_arr, 'INaCa': inaca_arr}
 df = pd.DataFrame(df)
-df.to_csv(f'../resources/ca_leak_frac.csv')
+df.to_csv(f'resources/ca_leak_frac.csv')
 
 ax_ileak.scatter([], [], edgecolors = color_map['Linear'], lw = 2, facecolors = 'none', label = 'linear')
 ax_ileak.scatter([], [], edgecolors = color_map['Saturating'], lw = 2, facecolors = 'none', label = 'saturating')
@@ -154,5 +150,5 @@ ax_itot.set_xlim(0, 0.28)
 
 
 plt.subplots_adjust(bottom=0.17, wspace = 0.3)
-plt.savefig('figure5.pdf')
+plt.savefig('figures/figure5.pdf')
 plt.close()

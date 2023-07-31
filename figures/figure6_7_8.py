@@ -16,7 +16,7 @@ sc_size = 0.06
 
 
 # load rrate, shape, cell name
-data = pd.read_csv('../output/r_rate_database.csv')
+data = pd.read_csv('output/r_rate_database.csv')
 
 # temp = BT, thold = 10, INaCa = On
 rate = data[(data['Temperature'] == 310) & (data['thold'] == 10) & (data['INaCa'] == 'On')]['Run rate']
@@ -281,9 +281,9 @@ for el in sub:
     #el.set_ylim(-0.003, 0.004)
     el.legend(loc = 'lower left')
 
-fig[0].savefig('figure6.pdf')
-fig[1].savefig('figure8.pdf')
-fig[2].savefig('figure7.pdf')
+fig[0].savefig('figures/figure6.pdf')
+fig[1].savefig('figures/figure8.pdf')
+fig[2].savefig('figures/figure7.pdf')
 
 plt.tight_layout()
 plt.close()
