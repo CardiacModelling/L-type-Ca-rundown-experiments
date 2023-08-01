@@ -21,4 +21,5 @@ This repository contains all data, protocols, codes, and figure generating files
 
 ## Software
 - **Python** The code requires Python (version 3.3+) and the Python dependencies `pandas`, `scipy`, and `statsmodels`
+  - The Python packages used in this project can be installed by running `pip install -r requirements.txt` in an environment with `Python 3.9.5`
 - **R** The linear regression requires R (version 4+) 

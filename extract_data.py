@@ -30,7 +30,7 @@ if 'BT_10_sweep_time.csv' not in os.listdir('resources/'):
         file = helpers.LoadJson(directories[0], pathtodatadir + directories[0] + '/')
         sweep_time = file.sweep_time()
         sweep_time = pd.DataFrame(sweep_time)
-        sweep_time.to_csv(f'resources/{dir[16:21]}_sweep_time.csv')
+        sweep_time.to_csv(f'resources/{dir[16:21]}_sweep_time.csv', index=False)
 
 # if chip dir not in output, create
 for dir in directories:

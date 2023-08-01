@@ -62,8 +62,6 @@ for i in range(len(rrate_data)):
 
     temp_arr.append(rrate_data['Temperature'].iloc[i])
     inaca_arr.append(rrate_data['INaCa'].iloc[i])
-    # print(rrate_data['Temperature'].iloc[i])
-    # continue
 
     # load the gleak, Eleak, and Cap 
     pathtoprop = f'output/{temp}_{hold}/prop_{cell}.csv'
@@ -123,7 +121,6 @@ for i in range(len(rrate_data)):
     ax_ileak.scatter(Ca_leak_norm, r_rate, edgecolors = color_map[shape], lw = 2, facecolors = 'none' )
     ax_itot.scatter(Ca_tot_norm, r_rate, edgecolors = color_map[shape], lw = 2, facecolors = 'none' )
 
-# Ca_frac = pd.DataFrame(Ca_frac, columns=['leak moles frac', 'Ca_eff'])
 df = {'leak moles frac': Ca_frac, 'Ca_eff': Ca_eff, 'Ca_tot': Ca_ntot, 'Temperature': temp_arr, \
       'thold': thold_arr, 'INaCa': inaca_arr}
 df = pd.DataFrame(df)
