@@ -286,3 +286,157 @@ def leak_proportion_calcium(temp, voltage):
     total = grad_K + grad_Na + grad_Ca + grad_Cl + grad_F + grad_Mg + grad_Cs #+ grad_ATP + grad_GTP
 
     return grad_K, grad_Na, grad_Ca, grad_Cl, grad_F, grad_Mg, grad_Cs, total
+
+def rundown_per_pulse():
+    out_dir = ['BT_10', 'BT_20', 'BT_40', 'RT_10', 'RT_20', 'RT_40']
+    N = 9 # Number of pulses to be compared
+    store_rates = {
+        10: {
+            'BT': {'On': [], 'Off': []},
+            'RT': {'On': [], 'Off': []}
+        },
+        20: {
+            'BT': {'On': [], 'Off': []},
+            'RT': {'On': [], 'Off': []}
+        },
+        40: {
+            'BT': {'On': [], 'Off': []},
+            'RT': {'On': [], 'Off': []}
+        }
+    }
+    for dir in out_dir:
+        temp = dir[:2]
+        hold_dur = int(dir[-2:])
+        fname = f'output/{dir}/'
+        files = os.listdir(fname)
+        for f in files:
+            if f[4:] == 'csv':
+                inaca = inaca_status(f[:3])
+                data = pd.read_csv(fname + f'{f}').min(axis=0)  
+                data = 1 - data.iloc[:-1]/data.iloc[0]    
+                data = data.iloc[1:] - data.iloc[:-1].values
+                run_pulse = data.median()
+                store_rates[hold_dur][temp][inaca].append(run_pulse) 
+
+    import matplotlib.pyplot as plt
+    fig = plt.figure(facecolor='white')
+    ax = fig.add_subplot(111)
+
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+
+    # temp = BT, thold = 10, INaCa = On
+    rate = store_rates[10]['BT']['On']
+    ax.boxplot(rate, positions=[0.5], medianprops = \
+               dict(color = colors[0]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate# .dropna()
+    x = np.random.normal(0.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[0], label = '$t_{hold}$: 10s', lw = 2, facecolors = 'none')
+
+    # temp = BT, thold = 10, INaCa = Off
+    rate = store_rates[10]['BT']['Off']
+    ax.boxplot(rate, positions = [2.5], medianprops = \
+               dict(color = colors[0]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate# .dropna()
+    x = np.random.normal(2.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[0], lw = 2, facecolors = 'none')
+
+    # temp = BT, thold = 20, INaCa = On
+    rate = store_rates[20]['BT']['On']
+    ax.boxplot(rate, positions = [1], medianprops = \
+    dict(color = colors[1]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(1, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[1], label = '$t_{hold}$: 20s', lw = 2, facecolors = 'none')
+
+    # temp = BT, thold = 20, INaCa = Off
+    rate = store_rates[20]['BT']['Off']
+    ax.boxplot(rate, positions = [3], medianprops = \
+               dict(color = colors[1]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(3, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[1], lw = 2, facecolors = 'none')
+
+    # temp = BT, thold = 40, INaCa = On
+    rate = store_rates[40]['BT']['On']
+    ax.boxplot(rate, positions = [1.5], medianprops = \
+               dict(color = colors[2]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(1.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[2], label = '$t_{hold}$: 40s', lw = 2, facecolors = 'none')
+
+    # temp = BT, thold = 40, INaCa = Off
+    rate = store_rates[40]['BT']['Off']
+    ax.boxplot(rate, positions = [3.5], medianprops = \
+               dict(color = colors[2]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(3.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[2], lw = 2, facecolors = 'none')
+
+    # temp = RT, thold = 10, INaCa = On
+    rate = store_rates[10]['RT']['On']
+    ax.boxplot(rate, positions = [4.5], medianprops = \
+               dict(color = colors[0]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(4.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[0], lw = 2, facecolors = 'none')
+
+    # temp = RT, thold = 10, INaCa = Off
+    rate = store_rates[10]['RT']['Off']
+    ax.boxplot(rate, positions = [6.5], medianprops = \
+               dict(color = colors[0]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(6.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[0], lw = 2, facecolors = 'none')
+
+    # temp = RT, thold = 20, INaCa = On
+    rate = store_rates[20]['RT']['On']
+    ax.boxplot(rate, positions = [5], medianprops = \
+               dict(color = colors[1]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[1], lw = 2, facecolors = 'none')
+
+    # temp = RT, thold = 20, INaCa = Off
+    rate = store_rates[20]['RT']['Off']
+    ax.boxplot(rate, positions = [7], medianprops = \
+                   dict(color = colors[1]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(7, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[1], lw = 2, facecolors = 'none')
+
+    # temp = RT, thold = 40, INaCa = On
+    rate = store_rates[40]['RT']['On']
+    ax.boxplot(rate, positions = [5.5], medianprops = \
+               dict(color = colors[2]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(5.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[2], lw = 2, facecolors = 'none')
+
+    # temp = RT, thold = 40, INaCa = Off
+    rate = store_rates[40]['RT']['Off']
+    ax.boxplot(rate, positions = [7.5], medianprops = \
+               dict(color = colors[2]), widths = 0.4, showfliers = False, whis = [0, 100])
+    y = rate#.dropna()
+    x = np.random.normal(7.5, 0.08, size = len(y))
+    ax.scatter(x, y, edgecolors = colors[2], lw = 2, facecolors = 'none')
+
+    ax.set_xticks([1, 3, 5, 7])
+
+    index_hold = ['310K\nNo Block', '310K\nINaCa Blocked', '298K\nNo Block', '298K\nINaCa Blocked']
+    ax.set_xticklabels(index_hold)
+
+    ax.set_ylabel('Rundown per pulse')
+    ax.legend(loc = 'lower left')
+    
+    return fig
+
+
+
+
+
+
+
+
+
+
+

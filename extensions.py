@@ -45,8 +45,6 @@ def selected_cells(temp, hold_dur):
             cells.append(lines[i][:3])
     return cells
 
-
-
 def select_cell_per_qc():
     """
     Outputs the number of cells selected from each chip
@@ -97,9 +95,6 @@ def select_cell_per_qc():
             print(temp, hold_dur, "|", ind_qc1_0, ind_qc1_1, ind_qc1_2, ind_qc1_3, ind_qc2_1,\
                  ind_qc2_2, ind_qc4, ind_qc5, ind_qc3_1, "|", selected)
             
-
-
-
 def simple_beeswarm(y, nbins=None):
         """
         Returns x coordinates for the points in ``y``, so that plotting ``x`` and
@@ -142,5 +137,4 @@ def simple_beeswarm(y, nbins=None):
                 x[b] = (0.5 + j / 3 + np.arange(len(b))) * -dx
 
         return x
-
 

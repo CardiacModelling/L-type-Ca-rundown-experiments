@@ -238,7 +238,7 @@ y = rate.dropna()
 x = np.random.normal(8.5, 0.08, size = len(y))
 sub[2].scatter(x, y, edgecolors = colors[1], lw = 2, facecolors = 'none')
 
-# temp = RT, thold = 40, INaCa = On
+# temp = RT, thold = 40, INaCa = Off
 rate = data[(data['Temperature'] == 298) & (data['thold'] == 40) & (data['INaCa'] == 'Off')]['Run rate']
 sub[0].boxplot(rate, positions = [7.5], medianprops = \
     dict(color = colors[2]), widths = 0.4, showfliers = False, whis = [0, 100])

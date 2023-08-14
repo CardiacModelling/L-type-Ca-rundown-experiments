@@ -26,8 +26,9 @@ if 'protocol_fig.csv' not in os.listdir('resources/'):
     file.voltage_protocol(name, fig = True)    
 
 if 'BT_10_sweep_time.csv' not in os.listdir('resources/'):
-    for dir in directories:
-        file = helpers.LoadJson(directories[0], pathtodatadir + directories[0] + '/')
+    for i in range(len(directories)):
+        dir = directories[i]
+        file = helpers.LoadJson(dir, pathtodatadir + dir + '/')
         sweep_time = file.sweep_time()
         sweep_time = pd.DataFrame(sweep_time)
         sweep_time.to_csv(f'resources/{dir[16:21]}_sweep_time.csv', index=False)

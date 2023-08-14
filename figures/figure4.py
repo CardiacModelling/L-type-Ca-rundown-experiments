@@ -46,7 +46,8 @@ for i in range(4):
             sub[i][j].set_xlabel('Time (s)')
 
         if j == 1 or j == 2:
-            sub[i][j].set_yticks([])
+            ticks = [-1, -0.75, -0.5, -0.25, 0] 
+            sub[i][j].set_yticks(ticks = ticks, labels = [])
 
 # store plots by the relevant experimental conditions
 plots_dicts = {
