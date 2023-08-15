@@ -374,7 +374,7 @@ class ReadData():
                 for i in range(len(self.all_sweeps_drug_sub.iloc[0])):
                     ax1.plot(time_x, self.all_sweeps_drug_sub.iloc[:, i].iloc[self.ind_step_start: self.ind_step_end], color = cmap[i])
                     ax2.scatter(t_arr.iloc[i], ical_peak.iloc[i], color = cmap[i])
-                    ax3.scatter(t_arr.iloc[i], -ical_peak.iloc[i]/ical_peak.iloc[0], color = cmap[i])
+                    ax3.scatter(t_arr.iloc[i], 1-ical_peak.iloc[i]/ical_peak.iloc[0], color = cmap[i])
                 
                 ax1.set_xlabel('Time from the beginning of the step to 0 mV\n at each sweep (ms)')
                 ax2.set_xlabel('Time (s)')

@@ -40,10 +40,10 @@ for i in range(n_col):
         t_tot = sweep_time.iloc[i][0] # time before sweep
         t = t_sweep + t_tot  # time stamp (in seconds)
         ax2.scatter(t, ical_peak, color = colors[i])
-        ax3.scatter(t, - ical_peak/data.iloc[ind_step_start:ind_step_end, 0].min(axis=0), color = colors[i])
+        ax3.scatter(t, 1 - ical_peak/data.iloc[ind_step_start:ind_step_end, 0].min(axis=0), colors[i])
     except:
         pass
-    
+
 # inset protocol
 ins_ax = inset_axes(ax1, width = "30%", height = '30%', loc = 'lower right', borderpad =1.8)
 ins_ax.plot(protocol.iloc[ind_step_start - 200: ind_step_end + 500, 0] - \
@@ -55,11 +55,12 @@ ax1.set_xlabel('Time from the beginning of the\n step to 0 mV for each sweep (ms
 ax2.set_xlabel('Time (s)')
 ax1.set_ylabel('Current (pA)')
 ax2.set_ylabel('Peak Current (pA)')
+norm_f = data.iloc[ind_step_start:ind_step_end, 0].min(axis=0)
 ymin, ymax = ax1.get_ylim()
 ymin_2, ymax_2 = ax2.get_ylim()
 ymin_3, ymax_3 = ax3.get_ylim()
 ax2.set_ylim(ymin, ymax)
-ax3.set_ylim(ymin_3*ymin/ymin_2, ymax_3*ymax/ymax_2)
+ax3.set_ylim(1 - ymin/norm_f, 1-ymax/norm_f)
 ax3.set_ylabel('Rundown')
 plt.tight_layout()
 plt.savefig('figures/figure1.pdf')
