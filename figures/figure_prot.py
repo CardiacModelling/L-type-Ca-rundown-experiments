@@ -15,7 +15,7 @@ x = np.concatenate((time, time + 10))
 y = np.concatenate((volt, volt))
 
 # Create two subplots with shared y-axis
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (6.6, 3))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (3.8, 3))
 
 # Set the limits of the x-axis on each subplot
 ax1_x1 = -0.2
