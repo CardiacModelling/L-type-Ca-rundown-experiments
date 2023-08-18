@@ -430,6 +430,107 @@ def rundown_per_pulse():
     
     return fig
 
+def calcium_calculations():
+    # Index for each step
+    protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
+    time = protocol.iloc[:,0]
+    dt = time[1] - time[0] #ms
+    i_start = protocol[time == 860].index.tolist()[0]
+    i_end = protocol[time == 1010].index.tolist()[0]
+
+    temp_map = {310: 'BT', 298 : 'RT'}
+
+    _, _, X_Ca, _, _, _, _, total = leak_proportion_calcium('BT', protocol.iloc[:, 1])
+    X_BT_arr = X_Ca/total
+    _, _, X_Ca, _, _, _, _, total = leak_proportion_calcium('BT', pd.DataFrame([-90])[0])
+    X_BT_hold = X_Ca/total
+
+    _, _, X_Ca, _, _, _, _, total = leak_proportion_calcium('RT', protocol.iloc[:, 1])
+    X_RT_arr = X_Ca/total
+    _, _, X_Ca, _, _, _, _, total = leak_proportion_calcium('RT', pd.DataFrame([-90])[0])
+    X_RT_hold = X_Ca/total
+
+    leak_prop = {'BT': [X_BT_arr, X_BT_hold], 'RT': [X_RT_arr, X_RT_hold]}
+
+    # load rrate, shape, cell name
+    rrate_data = pd.read_csv('output/r_rate_database.csv')
+
+    Ca_frac = []
+    Ca_eff = []
+    temp_arr = []
+    thold_arr = []
+    inaca_arr = []
+    Ca_ntot = []
+
+    for i in range(len(rrate_data)):
+        cell = rrate_data['Cell ID'].iloc[i]
+        r_rate = rrate_data['Run rate'].iloc[i]
+        shape = rrate_data['shape'].iloc[i]
+
+        temp = temp_map[rrate_data['Temperature'].iloc[i]]
+        hold = rrate_data['thold'].iloc[i]
+
+        temp_arr.append(rrate_data['Temperature'].iloc[i])
+        inaca_arr.append(rrate_data['INaCa'].iloc[i])
+
+        # load the gleak, Eleak, and Cap 
+        pathtoprop = f'output/{temp}_{hold}/prop_{cell}.csv'
+        prop_data = pd.read_csv(pathtoprop)
+
+        gleak = prop_data['gleak (nS)']
+        Eleak = prop_data['Eleak (mV)']
+        cap = prop_data['cap (pF)']
+
+        # load the ical across all sweeps for the cell
+        pathtocell = f'output/{temp}_{hold}/{cell}.csv'
+        ical_all = pd.read_csv(pathtocell)
+
+        n_sweeps = len(ical_all.columns)
+
+        # Calculate NCa from ical
+        Cai = - dt *ical_all.iloc[i_start: i_end, :].sum(axis = 0)/ (2 * 96500) # fmol
+        Cai_ical = Cai.sum()
+
+        # Calculate IleakCa
+        ## during sweeps
+        ileak_swe = pd.DataFrame()
+        for k in range(n_sweeps):
+            ileak_swe[k] = gleak.iloc[k] * (protocol.iloc[:, 1] - Eleak.iloc[k]) * leak_prop[temp][0]
+        Ca_leak = - dt *ileak_swe.iloc[i_start: i_end, :].sum(axis = 0)/ (2 * 96500) # fmol
+        Ca_leak = Ca_leak.sum()
+
+        ## between sweeps
+        t_sweep = pd.read_csv(f'resources/{temp}_{hold}_sweep_time.csv')
+        for l in range(n_sweeps - 1):
+            if l == 0:
+                I = gleak.iloc[l] * (-90 - Eleak.iloc[l]) * leak_prop[temp][1]
+                ca = - 1000 * (t_sweep.iloc[l+1] - 0)*I[0]/(2 * 96500) # fmol 
+                Ca_leak += ca[0]
+            elif np.isnan(gleak.iloc[l]):
+                I = gleak.iloc[l-1] * (-90 - Eleak.iloc[l-1]) * leak_prop[temp][1]
+                ca = - 1000 * (t_sweep.iloc[l+1] - t_sweep.iloc[l])*I[0]/(2 * 96500) # fmol 
+                Ca_leak += ca[0]
+            else:
+                I = gleak.iloc[l] * (-90 - Eleak.iloc[l]) * leak_prop[temp][1]
+                ca = - 1000 * (t_sweep.iloc[l+1] - t_sweep.iloc[l])*I[0]/(2 * 96500) # fmol 
+                Ca_leak += ca[0]
+
+        # Normalise NCa with Cap
+        cap_area = cap.median()**1.5
+        Ca_ical_norm = Cai_ical/cap_area
+        Ca_leak_norm = Ca_leak/cap_area
+        Ca_tot_norm = Ca_ical_norm + Ca_leak_norm
+
+        Ca_frac.append(Ca_leak/(Ca_leak + Cai_ical))
+        Ca_eff.append(Ca_tot_norm)
+        thold_arr.append(hold)
+        Ca_ntot.append(Ca_leak + Cai_ical)
+
+    df = {'leak moles frac': Ca_frac, 'Ca_eff': Ca_eff, 'Ca_tot': Ca_ntot, 'Temperature': temp_arr, \
+        'thold': thold_arr, 'INaCa': inaca_arr}
+    df = pd.DataFrame(df)
+    df.to_csv(f'resources/ca_leak_frac.csv')
+
 
 
 

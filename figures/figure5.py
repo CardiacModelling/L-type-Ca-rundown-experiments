@@ -1,151 +1,118 @@
-
-"""
-Scatter comparison of all rundown/kilosec against calcium brought in from:
-Left: ICaL
-Centre: Ileak
-Right: ICaL + Ileak
-"""
-import matplotlib.pyplot as plt
-import matplotlib
+# Plot rundown for all selected cells
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
+import extensions
 import helpers
-
-# Set font
-matplotlib.rc('font', family='arial', size = 10)
-
-temp_map = {310: 'BT', 298 : 'RT'}
-color_map = {'Linear': '#1f77b4', 'Saturating': '#ff7f0e', 'Other': 'grey'}
 
 # Index for each step
 protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
 time = protocol.iloc[:,0]
-dt = time[1] - time[0] #ms
 i_start = protocol[time == 860].index.tolist()[0]
 i_end = protocol[time == 1010].index.tolist()[0]
 
-_, _, X_Ca, _, _, _, _, total = helpers.leak_proportion_calcium('BT', protocol.iloc[:, 1])
-X_BT_arr = X_Ca/total
-_, _, X_Ca, _, _, _, _, total = helpers.leak_proportion_calcium('BT', pd.DataFrame([-90])[0])
-X_BT_hold = X_Ca/total
 
-_, _, X_Ca, _, _, _, _, total = helpers.leak_proportion_calcium('RT', protocol.iloc[:, 1])
-X_RT_arr = X_Ca/total
-_, _, X_Ca, _, _, _, _, total = helpers.leak_proportion_calcium('RT', pd.DataFrame([-90])[0])
-X_RT_hold = X_Ca/total
+temperature = ['BT', 'RT']
+holding_duration = [10, 20, 40]
 
-leak_prop = {'BT': [X_BT_arr, X_BT_hold], 'RT': [X_RT_arr, X_RT_hold]}
+# plot
 
-# load rrate, shape, cell name
-rrate_data = pd.read_csv('output/r_rate_database.csv')
+# Create a 4x3 plot
+fig = plt.figure(figsize=(6.6, 8))
+gs = fig.add_gridspec(4, 3)
 
-Ca_frac = []
-Ca_eff = []
-temp_arr = []
-thold_arr = []
-inaca_arr = []
-Ca_ntot = []
-
-fig = plt.figure(figsize=(6.6, 3))
-ax_ical = fig.add_subplot(131)
-ax_ileak = fig.add_subplot(132)
-ax_itot = fig.add_subplot(133)
-
-for i in range(len(rrate_data)):
-    cell = rrate_data['Cell ID'].iloc[i]
-    r_rate = rrate_data['Run rate'].iloc[i]
-    shape = rrate_data['shape'].iloc[i]
-
-    temp = temp_map[rrate_data['Temperature'].iloc[i]]
-    hold = rrate_data['thold'].iloc[i]
-
-    temp_arr.append(rrate_data['Temperature'].iloc[i])
-    inaca_arr.append(rrate_data['INaCa'].iloc[i])
-
-    # load the gleak, Eleak, and Cap 
-    pathtoprop = f'output/{temp}_{hold}/prop_{cell}.csv'
-    prop_data = pd.read_csv(pathtoprop)
-
-    gleak = prop_data['gleak (nS)']
-    Eleak = prop_data['Eleak (mV)']
-    cap = prop_data['cap (pF)']
-
-    # load the ical across all sweeps for the cell
-    pathtocell = f'output/{temp}_{hold}/{cell}.csv'
-    ical_all = pd.read_csv(pathtocell)
-
-    n_sweeps = len(ical_all.columns)
-
-    # Calculate NCa from ical
-    Cai = - dt *ical_all.iloc[i_start: i_end, :].sum(axis = 0)/ (2 * 96500) # fmol
-    Cai_ical = Cai.sum()
-
-    # Calculate IleakCa
-    ## during sweeps
-    ileak_swe = pd.DataFrame()
-    for i in range(n_sweeps):
-        ileak_swe[i] = gleak.iloc[i] * (protocol.iloc[:, 1] - Eleak.iloc[i]) * leak_prop[temp][0]
-    Ca_leak = - dt *ileak_swe.iloc[i_start: i_end, :].sum(axis = 0)/ (2 * 96500) # fmol
-    Ca_leak = Ca_leak.sum()
-
-    ## between sweeps
-    t_sweep = pd.read_csv(f'resources/{temp}_{hold}_sweep_time.csv')
-    for i in range(n_sweeps - 1):
+sub = [[], [], [], []]
+for i in range(4):
+    for j in range(3):
+        sub[i].append(fig.add_subplot(gs[i, j]))
+        sub[i][j].set_ylim(-1.2, 0)
+        if j == 0:
+            if i == 0:
+                sub[i][j].set_ylabel('310 K, INaCa On\nRundown')
+                sub[i][j].set_title('$t_{hold}$: 10s')
+            elif i == 1:
+                sub[i][j].set_ylabel('310 K, INaCa Off\nRundown')
+            elif i == 2:
+                sub[i][j].set_ylabel('298 K, INaCa On\nRundown')
+            else:
+                sub[i][j].set_ylabel('298 K, INaCa Off\nRundown')
         if i == 0:
-            I = gleak.iloc[i] * (-90 - Eleak.iloc[i]) * leak_prop[temp][1]
-            ca = - 1000 * (t_sweep.iloc[i+1] - 0)*I[0]/(2 * 96500) # fmol 
-            Ca_leak += ca[0]
-        elif np.isnan(gleak.iloc[i]):
-            I = gleak.iloc[i-1] * (-90 - Eleak.iloc[i-1]) * leak_prop[temp][1]
-            ca = - 1000 * (t_sweep.iloc[i+1] - t_sweep.iloc[i])*I[0]/(2 * 96500) # fmol 
-            Ca_leak += ca[0]
-        else:
-            I = gleak.iloc[i] * (-90 - Eleak.iloc[i]) * leak_prop[temp][1]
-            ca = - 1000 * (t_sweep.iloc[i+1] - t_sweep.iloc[i])*I[0]/(2 * 96500) # fmol 
-            Ca_leak += ca[0]
+            if j == 1:
+                sub[i][j].set_title('$t_{hold}$: 20s')
+            elif j == 2:
+                sub[i][j].set_title('$t_{hold}$: 40s')
+        if i == 3:
+            sub[i][j].set_xlabel('Time (s)')
 
-    # Normalise NCa with Cap
-    cap_area = cap.median()**1.5
-    Ca_ical_norm = Cai_ical/cap_area
-    Ca_leak_norm = Ca_leak/cap_area
-    Ca_tot_norm = Ca_ical_norm + Ca_leak_norm
+        if j == 1 or j == 2:
+            ticks = [-1, -0.75, -0.5, -0.25, 0] 
+            sub[i][j].set_yticks(ticks = ticks, labels = [])
 
-    Ca_frac.append(Ca_leak/(Ca_leak + Cai_ical))
-    Ca_eff.append(Ca_tot_norm)
-    thold_arr.append(hold)
-    Ca_ntot.append(Ca_leak + Cai_ical)
+# store plots by the relevant experimental conditions
+plots_dicts = {
+    '10' : {
+        'BT' : [sub[0][0], sub[1][0]],
+        'RT' : [sub[2][0], sub[3][0]]
+    },
+    '20' : {
+        'BT' : [sub[0][1], sub[1][1]],
+        'RT' : [sub[2][1], sub[3][1]]
+    },
+    '40' : {
+        'BT' : [sub[0][2], sub[1][2]],
+        'RT' : [sub[2][2], sub[3][2]]
+    }
+}
 
-    # plot
-    ax_ical.scatter(Ca_ical_norm, r_rate, edgecolors = color_map[shape], lw = 2, facecolors = 'none' )
-    ax_ileak.scatter(Ca_leak_norm, r_rate, edgecolors = color_map[shape], lw = 2, facecolors = 'none' )
-    ax_itot.scatter(Ca_tot_norm, r_rate, edgecolors = color_map[shape], lw = 2, facecolors = 'none' )
+for temp in temperature:
+    for hold_dur in holding_duration:
+        # load the data
+        cells = extensions.selected_cells(temp, hold_dur)
+        sweep_time = pd.read_csv(f'resources/{temp}_{hold_dur}_sweep_time.csv')
+        
+        path = f'output/{temp}_{hold_dur}/'
 
-df = {'leak moles frac': Ca_frac, 'Ca_eff': Ca_eff, 'Ca_tot': Ca_ntot, 'Temperature': temp_arr, \
-      'thold': thold_arr, 'INaCa': inaca_arr}
-df = pd.DataFrame(df)
-df.to_csv(f'resources/ca_leak_frac.csv')
+        count_on = 0
+        count_off = 0
+        plots = plots_dicts[f'{hold_dur}'][temp]
 
-ax_ileak.scatter([], [], edgecolors = color_map['Linear'], lw = 2, facecolors = 'none', label = 'linear')
-ax_ileak.scatter([], [], edgecolors = color_map['Saturating'], lw = 2, facecolors = 'none', label = 'saturating')
-ax_ileak.scatter([], [], edgecolors = color_map['Other'], lw = 2, facecolors = 'none', label = 'other' )
+        for cell in cells:
+            ptocell = path + f'{cell}.csv'
+            ical_all = pd.read_csv(ptocell)
 
-ax_ical.set_ylabel('$R_{rate}$ (1/min)')
-ax_ical.set_xlabel('$N_{Ca}$/$C_{m}^{{3}/{2}}$ (fmol/$\mathrm{pF}^{3/2}$)')
-# ax_ical.set_ylim(0, 3)
-ax_ical.set_xlim(0, 0.2)
+            # Calculate rundown array 
+            ical_peak = ical_all.iloc[i_start: i_end, :].min(axis = 0)
+            rundown = -1*ical_peak/ical_peak.iloc[0]
+            rundown = rundown.tolist()
+
+            # calculate time array 
+            i_min = ical_all.iloc[i_start: i_end, :].idxmin(axis = 0)
+            t_stamp = [] # in seconds
+            for i in range(len(i_min)):
+                if np.isnan(i_min[i]):
+                    t_stamp.append(np.nan)
+                else:
+                    # add time from sweep to the sweep start time
+                    t = protocol.iloc[int(i_min[i]), 0]/1000 + \
+                        sweep_time.iloc[i].to_numpy()[0]  # seconds
+
+                    t_stamp.append(t) # in seconds 
+
+            
+            # count and plot in the relevant subplot
+            inaca_stat = helpers.inaca_status(cell)
+            if inaca_stat == 'On':
+                count_on += 1
+                plots[0].plot(t_stamp, rundown, marker = 'o', color = 'grey', markersize = 0.5, lw = 0.5)
+            if inaca_stat == 'Off':
+                count_off += 1
+                plots[1].plot(t_stamp, rundown, marker = 'o', color = 'grey', markersize = 0.5, lw = 0.5)
+        
+        plots[0].text(0.05, 0.9, str(count_on), transform = plots[0].transAxes)
+        plots[1].text(0.05, 0.9, str(count_off), transform = plots[1].transAxes)
 
 
-ax_ileak.set_xlabel('$N_{Ca}$/$C_{m}^{{3}/{2}}$ (fmol/$\mathrm{pF}^{3/2}$)')
-# ax_ileak.set_ylim(0, 3)
-ax_ileak.set_xlim(0, 0.11)
-ax_ileak.legend(ncol =3, bbox_to_anchor = (0.2, 1.02, 0.6, 0.15), loc = 'center', bbox_transform = ax_ileak.transAxes)
-
-ax_itot.set_xlabel('$N_{Ca}$/$C_{m}^{{3}/{2}}$ (fmol/$\mathrm{pF}^{3/2}$)')
-# ax_itot.set_ylim(0, 3)
-ax_itot.set_xlim(0, 0.28)
-
-
-plt.subplots_adjust(bottom=0.17, wspace = 0.3)
-plt.savefig('figures/figure5.pdf')
+plt.tight_layout()
+fig.savefig('figures/figure5.pdf', facecolor='w', transparent=False)
 plt.close()

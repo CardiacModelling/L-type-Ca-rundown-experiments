@@ -68,5 +68,5 @@ ax1.set_xlabel('Time (s)', horizontalalignment='right', x=1.15)
 
 plt.tight_layout(w_pad = 0.01)
 
-plt.savefig('figures/figure_prot.pdf')
+plt.savefig('figures/figure2.pdf')
 plt.close()

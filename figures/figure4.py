@@ -1,118 +1,109 @@
-# Plot rundown for all selected cells
-import pandas as pd
-import numpy as np
+# Creates a figure showing post-processing of the raw current
+import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import pandas as pd
+# import numpy as np
+import os
 
-import extensions
-import helpers
+import helpers # for cap ciltering
 
-# Index for each step
+# Set font
+matplotlib.rc('font', family='arial', size = 10)
+
+# load protocol
 protocol = pd.read_csv('resources/protocol.csv', delimiter=',')
 time = protocol.iloc[:,0]
-i_start = protocol[time == 860].index.tolist()[0]
-i_end = protocol[time == 1010].index.tolist()[0]
+ind_step_start = protocol[time == 860].index.tolist()[0]
+ind_step_end = protocol[time == 1010].index.tolist()[0]
 
+# load all current
+directoryname = 'Cav1.2_Run_Down_BT_10s_20210129_12.07.03'
+pathtodatadirectory = 'raw_data/'
+files = os.listdir(f'raw_data/{directoryname}')
+cell = 'C19'
+for f in files:
+    if f[-8:-5] == cell:
+        filename = f
+        path = f'raw_data/{directoryname}/{filename}'
+        break
+cell_data = pd.read_csv(path, sep =';', usecols=range(1,58 + 2))
 
-temperature = ['BT', 'RT']
-holding_duration = [10, 20, 40]
+all_sweeps = cell_data.iloc[2:, 1:].astype(float) * pow(10, 12) # Convert A to pA 
 
-# plot
+all_sweeps = helpers.cap_filter(ind_step_start, ind_step_end, 0.1, all_sweeps) #Cap filter
+all_sweeps = all_sweeps.iloc[:, :34 + 1]
 
-# Create a 4x3 plot
+# load the gleak, Eleak, etc.
+prop_data = pd.read_csv(f'output/BT_10/prop_{cell}.csv')
+g_1, E_1 = prop_data.iloc[0]['gleak (nS)'], prop_data.iloc[0]['Eleak (mV)']
+g_n, E_n = prop_data.iloc[-1]['gleak (nS)'], prop_data.iloc[-1]['Eleak (mV)'] 
+
+leak_1 = g_1*(protocol.iloc[:, 1] - E_1)
+leak_2 = g_n*(protocol.iloc[:, 1] - E_n)
+
+# leak subtracted current
+sweep1_sub = all_sweeps.iloc[:, 0].reset_index(drop=True).sub(leak_1.reset_index(drop=True), axis = 0) 
+sweepn_sub = all_sweeps.iloc[:, -1].reset_index(drop=True).sub(leak_2.reset_index(drop=True), axis = 0) 
+
+# load figure
 fig = plt.figure(figsize=(6.6, 8))
-gs = fig.add_gridspec(4, 3)
+gs = gridspec.GridSpec(ncols =1, nrows = 5)
+sub1 = fig.add_subplot(gs[0, 0])
+sub2 = fig.add_subplot(gs[1, 0])
+sub3 = fig.add_subplot(gs[2, 0])
+sub4 = fig.add_subplot(gs[3, 0])
+sub5 = fig.add_subplot(gs[4, :])
 
-sub = [[], [], [], []]
-for i in range(4):
-    for j in range(3):
-        sub[i].append(fig.add_subplot(gs[i, j]))
-        sub[i][j].set_ylim(-1.2, 0)
-        if j == 0:
-            if i == 0:
-                sub[i][j].set_ylabel('310 K, INaCa On\nRundown')
-                sub[i][j].set_title('$t_{hold}$: 10s')
-            elif i == 1:
-                sub[i][j].set_ylabel('310 K, INaCa Off\nRundown')
-            elif i == 2:
-                sub[i][j].set_ylabel('298 K, INaCa On\nRundown')
-            else:
-                sub[i][j].set_ylabel('298 K, INaCa Off\nRundown')
-        if i == 0:
-            if j == 1:
-                sub[i][j].set_title('$t_{hold}$: 20s')
-            elif j == 2:
-                sub[i][j].set_title('$t_{hold}$: 40s')
-        if i == 3:
-            sub[i][j].set_xlabel('Time (s)')
+props = dict(boxstyle='round', facecolor='grey', alpha=0.1)
+sub1.text(0.015, 0.12, 'A: Pre-nifedipine', transform = sub1.transAxes, weight = 'bold', bbox=props)
+sub2.text(0.015, 0.12, 'B: Post-nifedipine', transform = sub2.transAxes, weight = 'bold', bbox=props)
+sub3.text(0.015, 0.12, 'C: Pre-nifedipine', transform = sub3.transAxes, weight = 'bold', bbox=props)
+sub4.text(0.015, 0.12, 'D: Post-nifedipine', transform = sub4.transAxes, weight = 'bold', bbox=props)
+sub5.text(0.015, 0.12, 'E = C-D', transform = sub5.transAxes, weight = 'bold', bbox=props)
 
-        if j == 1 or j == 2:
-            ticks = [-1, -0.75, -0.5, -0.25, 0] 
-            sub[i][j].set_yticks(ticks = ticks, labels = [])
+sub1.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
+sub2.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
+sub3.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
+sub4.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
+sub5.axhline(0, color='grey', ls= 'dashed', lw = 0.8)
 
-# store plots by the relevant experimental conditions
-plots_dicts = {
-    '10' : {
-        'BT' : [sub[0][0], sub[1][0]],
-        'RT' : [sub[2][0], sub[3][0]]
-    },
-    '20' : {
-        'BT' : [sub[0][1], sub[1][1]],
-        'RT' : [sub[2][1], sub[3][1]]
-    },
-    '40' : {
-        'BT' : [sub[0][2], sub[1][2]],
-        'RT' : [sub[2][2], sub[3][2]]
-    }
-}
+# plot inset protocol
+protocol_fig = pd.read_csv('resources/protocol_fig.csv', delimiter=',')
+ins_ax = inset_axes(sub3, width = "30%", height = '52%', loc = 'center', borderpad =3.2)
+ins_ax.plot(time, protocol_fig.iloc[:,1], color ='grey')
 
-for temp in temperature:
-    for hold_dur in holding_duration:
-        # load the data
-        cells = extensions.selected_cells(temp, hold_dur)
-        sweep_time = pd.read_csv(f'resources/{temp}_{hold_dur}_sweep_time.csv')
-        
-        path = f'output/{temp}_{hold_dur}/'
+colors = ['#1f77b4', '#ff7f0e']
 
-        count_on = 0
-        count_off = 0
-        plots = plots_dicts[f'{hold_dur}'][temp]
+sub1.plot(time, all_sweeps.iloc[:, 0], color = colors[0])
+sub2.plot(time, all_sweeps.iloc[:, -1], color = colors[1])
+sub1.plot(time, leak_1, color = 'grey', label = \
+          f'gleak = {round(g_1, 1)}nS, Eleak = {round(E_1, 1)}mV')
+sub2.plot(time, leak_2, color = 'grey', label = \
+          f'gleak = {round(g_n, 1)}nS, Eleak = {round(E_n, 1)}mV')
+sub3.plot(time, sweep1_sub, color = colors[0])
+sub4.plot(time, sweepn_sub, color = colors[1])
+sub5.plot(time, sweep1_sub - sweepn_sub.values, color = colors[0])
 
-        for cell in cells:
-            ptocell = path + f'{cell}.csv'
-            ical_all = pd.read_csv(ptocell)
 
-            # Calculate rundown array 
-            ical_peak = ical_all.iloc[i_start: i_end, :].min(axis = 0)
-            rundown = -1*ical_peak/ical_peak.iloc[0]
-            rundown = rundown.tolist()
+sub1.set_ylabel('Raw current (pA)\n sweep 1')
+sub3.set_ylabel('Leak-subtracted\ncurrent (pA)\nsweep 1')
+sub5.set_ylabel('Leak-drug-\nsubtracted\ncurrent (pA)\nsweep 1')
+sub2.set_ylabel('Raw current (pA)\nsweep $n_2$')
+sub4.set_ylabel('Leak-subtracted\ncurrent (pA)\nsweep $n_2$')
+sub5.set_xlabel('Time from the beginning of the first sweep (ms)')
 
-            # calculate time array 
-            i_min = ical_all.iloc[i_start: i_end, :].idxmin(axis = 0)
-            t_stamp = [] # in seconds
-            for i in range(len(i_min)):
-                if np.isnan(i_min[i]):
-                    t_stamp.append(np.nan)
-                else:
-                    # add time from sweep to the sweep start time
-                    t = protocol.iloc[int(i_min[i]), 0]/1000 + \
-                        sweep_time.iloc[i].to_numpy()[0]  # seconds
+sub2.legend(loc = 'upper center')
+sub1.legend(loc = 'lower center')
 
-                    t_stamp.append(t) # in seconds 
-
-            
-            # count and plot in the relevant subplot
-            inaca_stat = helpers.inaca_status(cell)
-            if inaca_stat == 'On':
-                count_on += 1
-                plots[0].plot(t_stamp, rundown, marker = 'o', color = 'grey', markersize = 0.5, lw = 0.5)
-            if inaca_stat == 'Off':
-                count_off += 1
-                plots[1].plot(t_stamp, rundown, marker = 'o', color = 'grey', markersize = 0.5, lw = 0.5)
-        
-        plots[0].text(0.05, 0.9, str(count_on), transform = plots[0].transAxes)
-        plots[1].text(0.05, 0.9, str(count_off), transform = plots[1].transAxes)
+yticks = matplotlib.ticker.MaxNLocator(4)
+sub1.yaxis.set_major_locator(yticks)
+sub3.yaxis.set_major_locator(yticks)
+sub4.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(4))
+sub5.yaxis.set_major_locator(yticks)
 
 
 plt.tight_layout()
-fig.savefig('figures/figure4.pdf', facecolor='w', transparent=False)
+plt.savefig('figures/figure4.pdf')
 plt.close()

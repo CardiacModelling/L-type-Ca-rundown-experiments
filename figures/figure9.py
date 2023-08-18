@@ -39,5 +39,5 @@ plt.xticks([0, 1, 2, 3], [r'-$\beta_0$', r'$\beta_1$', r'$\beta_2$', r'$\beta_3$
 plt.ylabel('Coefficient')
 
 plt.tight_layout()
-plt.savefig('figures/figure_beta.pdf', facecolor='w', transparent=False)
+plt.savefig('figures/figure9.pdf', facecolor='w', transparent=False)
 plt.close()
