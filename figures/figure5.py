@@ -26,7 +26,7 @@ sub = [[], [], [], []]
 for i in range(4):
     for j in range(3):
         sub[i].append(fig.add_subplot(gs[i, j]))
-        sub[i][j].set_ylim(-1.2, 0)
+        sub[i][j].set_ylim(-0.2, 1)
         if j == 0:
             if i == 0:
                 sub[i][j].set_ylabel('310 K, INaCa On\nRundown')
@@ -46,8 +46,12 @@ for i in range(4):
             sub[i][j].set_xlabel('Time (s)')
 
         if j == 1 or j == 2:
-            ticks = [-1, -0.75, -0.5, -0.25, 0] 
+            ticks = [1, 0.75, 0.5, 0.25, 0] 
             sub[i][j].set_yticks(ticks = ticks, labels = [])
+
+        if i == 0 or i == 1 or i == 2:
+            ticks = [0, 100, 200, 300]
+            sub[i][j].set_xticks(ticks = ticks, labels = [])
 
 # store plots by the relevant experimental conditions
 plots_dicts = {
@@ -83,7 +87,7 @@ for temp in temperature:
 
             # Calculate rundown array 
             ical_peak = ical_all.iloc[i_start: i_end, :].min(axis = 0)
-            rundown = -1*ical_peak/ical_peak.iloc[0]
+            rundown = 1-1*ical_peak/ical_peak.iloc[0]
             rundown = rundown.tolist()
 
             # calculate time array 
@@ -99,7 +103,9 @@ for temp in temperature:
 
                     t_stamp.append(t) # in seconds 
 
-            
+            t_stamp = [x for x in t_stamp if x == x] # cleans out float NaNs
+            rundown = [x for x in rundown if x == x] # cleans out float NaNs
+           
             # count and plot in the relevant subplot
             inaca_stat = helpers.inaca_status(cell)
             if inaca_stat == 'On':

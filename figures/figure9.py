@@ -15,10 +15,10 @@ ci_l_2, ci_u_2 = -0.03490557, -0.007153578
 # Plot Confidence interval and beta values
 fig = plt.figure(figsize=(3.8, 3))
 
-plt.scatter(0, -b_0, color = 'tab:blue')
-plt.hlines(- ci_l_0, xmin = -0.2, xmax = 0.2, color = 'grey')
-plt.hlines(- ci_u_0, xmin = -0.2, xmax = 0.2, color = 'grey')
-plt.vlines(0, ymin = - ci_l_0, ymax = - ci_u_0, color = 'grey')
+plt.scatter(0, b_0, color = 'tab:blue')
+plt.hlines(ci_l_0, xmin = -0.2, xmax = 0.2, color = 'grey')
+plt.hlines(ci_u_0, xmin = -0.2, xmax = 0.2, color = 'grey')
+plt.vlines(0, ymin = ci_l_0, ymax = ci_u_0, color = 'grey')
 
 plt.scatter(1, b_1, color = 'tab:blue')
 plt.hlines(ci_l_1, xmin = 0.8, xmax = 1.2, color = 'grey')
@@ -35,7 +35,9 @@ plt.hlines(ci_l_3, xmin = 2.8, xmax = 3.2, color = 'grey')
 plt.hlines(ci_u_3, xmin = 2.8, xmax = 3.2, color = 'grey')
 plt.vlines(3, ymin = ci_l_3, ymax = ci_u_3, color = 'grey')
 
-plt.xticks([0, 1, 2, 3], [r'-$\beta_0$', r'$\beta_1$', r'$\beta_2$', r'$\beta_3$'])
+plt.axhline(0, ls = '--', color = 'tab:grey')
+
+plt.xticks([0, 1, 2, 3], [r'$\beta_0$', r'$\beta_1$', r'$\beta_2$', r'$\beta_3$'])
 plt.ylabel('Coefficient')
 
 plt.tight_layout()
