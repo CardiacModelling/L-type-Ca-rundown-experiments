@@ -49,7 +49,7 @@ ins_ax = inset_axes(ax1, width = "30%", height = '30%', loc = 'lower right', bor
 ins_ax.plot(protocol.iloc[ind_step_start - 200: ind_step_end + 500, 0] - \
             protocol.iloc[ind_step_start: ind_step_end + 700, 0].iloc[0], \
     protocol.iloc[ind_step_start - 200: ind_step_end + 500,1], color ='grey')
-ins_ax.set_title('X 33 times')
+ins_ax.set_title('33 times')
 
 ax1.set_xlabel('Time from the beginning of the\n step to 0 mV for each sweep (ms)')
 ax2.set_xlabel('Time (s)')
@@ -64,3 +64,4 @@ ax3.set_ylim(1 - ymin/norm_f, 1-ymax/norm_f)
 ax3.set_ylabel('Rundown')
 plt.tight_layout()
 plt.savefig('figures/figure1.pdf')
+plt.close()

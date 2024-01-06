@@ -20,17 +20,63 @@ multi.fit = lm(Run.rate~thold + factor(Temperature) + factor(INaCa), data=datase
 res = summary(multi.fit)
 
 # print output
+print("############### Summary of model fit ###############")
 print(summary(multi.fit))
 print(confint(multi.fit))
+print("####################################################")
 
 # For H1: beta < 0
 p_value_less = pt(coef(res)[, 3], multi.fit$df, lower = TRUE)
+print("## Test for directionality (beta coefficients <0) ##")
 print(p_value_less)
+print("####################################################")
+
+# Statistical reduction by addition of temperature
+initial.model <- lm(Run.rate ~ 1, data = dataset)  
+full.model <- lm(Run.rate ~ factor(Temperature), data = dataset)
+
+# Perform F-test
+f_test_result <- anova(initial.model, full.model)
+
+print("##### Statistical reduction due to temperature #####")
+print(f_test_result)
+print("####################################################")
+
+# Statistical reduction by addition of INaCa
+initial.model <- lm(Run.rate ~ factor(Temperature), data = dataset)  
+full.model <- lm(Run.rate ~ factor(Temperature) + factor(INaCa), data = dataset)
+
+# Perform F-test
+f_test_result <- anova(initial.model, full.model)
+
+print("######## Statistical reduction due to INaCa ########")
+print(f_test_result)
+print("####################################################")
+
+# Statistical reduction by addition of thold
+initial.model <- lm(Run.rate ~ factor(Temperature)+ factor(INaCa), data = dataset)  
+full.model <- lm(Run.rate ~ factor(Temperature) + factor(INaCa) + thold, data = dataset)
+
+# Perform F-test
+f_test_result <- anova(initial.model, full.model)
+
+print("######## Statistical reduction due to thold ########")
+print(f_test_result)
+print("####################################################")
+
+
 
 # For H1: beta > 0
-p_value_greater = pt(coef(res)[, 3], multi.fit$df, lower = FALSE)
-print(p_value_greater)
-#%%%%%%%%%%%%%%%%%%OUTPUT%%%%%%%%%%%%%%%%%%%%%%%
+# p_value_greater = pt(coef(res)[, 3], multi.fit$df, lower = FALSE)
+# print(p_value_greater)
+
+#%%%%%%%%%%%%%%%%%%%%%%%%OUTPUT%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# [1] "############### Summary of model fit ###############"
+
+# Call:
+# lm(formula = Run.rate ~ thold + factor(Temperature) + factor(INaCa), 
+#     data = dataset)
 
 # Residuals:
 #       Min        1Q    Median        3Q       Max 
@@ -54,23 +100,41 @@ print(p_value_greater)
 # thold                  -0.02930387 -0.003442791
 # factor(Temperature)298 -0.07628548 -0.048139628
 # factor(INaCa)On        -0.03490557 -0.007153578
+# [1] "####################################################"
+# [1] "## Test for directionality (beta coefficients <0) ##"
+#            (Intercept)                  thold factor(Temperature)298        factor(INaCa)On 
+#           1.000000e+00           6.708997e-03           2.079688e-15           1.606375e-03 
+# [1] "####################################################"
+# [1] "##### Statistical reduction due to temperature #####"
+# Analysis of Variance Table
 
+# Model 1: Run.rate ~ 1
+# Model 2: Run.rate ~ factor(Temperature)
+#   Res.Df     RSS Df Sum of Sq      F    Pr(>F)    
+# 1    155 0.48405                                  
+# 2    154 0.31631  1   0.16773 81.661 6.389e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# [1] "####################################################"
+# [1] "######## Statistical reduction due to INaCa ########"
+# Analysis of Variance Table
 
+# Model 1: Run.rate ~ factor(Temperature)
+# Model 2: Run.rate ~ factor(Temperature) + factor(INaCa)
+#   Res.Df     RSS Df Sum of Sq      F   Pr(>F)   
+# 1    154 0.31631                                
+# 2    153 0.30010  1  0.016211 8.2647 0.004619 **
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# [1] "####################################################"
+# [1] "######## Statistical reduction due to thold ########"
+# Analysis of Variance Table
 
-# Null hypothesis: Coefficient is 0
-# Std Error: Lower error means better estimation
-# t value: Larger t-value (]-2, 2[) indicate evidence against the null hypothesis 
-# p-value: a p-value less than .05 rejects the null hypothesis
-# Confidence intervals: a confidence interval that does not include 0 is good
-
-# p-values for H1: beta < 0
-# (Intercept)            :  1.000000e+00
-# thold                  :  6.708997e-03
-# factor(Temperature)298 :  2.079688e-15
-# factor(INaCa)On        :  1.606375e-03
-
-# p-values for H1: beta > 0
-# (Intercept)            :  1.078998e-13
-# thold                  :  9.932910e-01 
-# factor(Temperature)298 :  1.000000e+00
-# factor(INaCa)On        :  9.983936e-01
+# Model 1: Run.rate ~ factor(Temperature) + factor(INaCa)
+# Model 2: Run.rate ~ factor(Temperature) + factor(INaCa) + thold
+#   Res.Df     RSS Df Sum of Sq      F  Pr(>F)  
+# 1    153 0.30010                              
+# 2    152 0.28824  1  0.011868 6.2586 0.01342 *
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# [1] "####################################################"
