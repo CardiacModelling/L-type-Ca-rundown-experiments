@@ -26,7 +26,7 @@ sub = [[], [], [], []]
 for i in range(4):
     for j in range(3):
         sub[i].append(fig.add_subplot(gs[i, j]))
-        sub[i][j].set_ylim(-0.2, 1)
+        sub[i][j].axhline(y=0, lw = 0.5, color = 'black')
         if j == 0:
             if i == 0:
                 sub[i][j].set_ylabel('310 K, INaCa On\nRundown')
@@ -46,7 +46,7 @@ for i in range(4):
             sub[i][j].set_xlabel('Time (s)')
 
         if j == 1 or j == 2:
-            ticks = [1, 0.75, 0.5, 0.25, 0] 
+            ticks = [-2, -1, 0, 1] 
             sub[i][j].set_yticks(ticks = ticks, labels = [])
 
         if i == 0 or i == 1 or i == 2:
@@ -118,6 +118,9 @@ for temp in temperature:
         plots[0].text(0.05, 0.9, str(count_on), transform = plots[0].transAxes)
         plots[1].text(0.05, 0.9, str(count_off), transform = plots[1].transAxes)
 
+for i in range(4):
+    for j in range(3):
+        sub[i][j].set_ylim(-1, 1)
 
 plt.tight_layout()
 fig.savefig('figures/figure5.pdf', facecolor='w', transparent=False)
